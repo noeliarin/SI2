@@ -6,11 +6,12 @@ def verificar_censo(censo_data):
     """Check if the voter is registered in the Censo."""
     try:
         api_url = settings.RESTAPIBASEURL + 'censo/'
-        response = requests.get(api_url, params=censo_data)
+        # Usamos POST y enviamos el payload en formato JSON
+        response = requests.post(api_url, json=censo_data)
         response.raise_for_status()
-        
-        censo_data = response.json()
-        return bool(censo_data)
+
+        data_response = response.json()
+        return bool(data_response)
     except requests.exceptions.RequestException as e:
         print(f"Error en verificar_censo: {e}")
         return False
@@ -23,15 +24,14 @@ def registrar_voto(voto_dict):
         response = requests.post(api_url, json=voto_dict)
         response.raise_for_status()
 
-        if response.status_code == 201:
+        if response.status_code in (200, 201):
             return response.json()
         else:
-            print(f"Error al registrar el voto. Código: {response.status_code}. Mensaje: {response.text}")
             return None
     except requests.exceptions.RequestException as e:
         print(f"Error en registrar_voto: {e}")
         return None
-
+    
 # Eliminar un voto a través de la API REST
 def eliminar_voto(idVoto):
     """Delete a vote from the API."""
@@ -40,7 +40,8 @@ def eliminar_voto(idVoto):
         response = requests.delete(api_url)
         response.raise_for_status()
         
-        return response.status_code == 204
+        # Acepta 200 o 204 como operación exitosa
+        return response.status_code in (200, 204)
     except requests.exceptions.RequestException as e:
         print(f"Error en eliminar_voto: {e}")
         return False
