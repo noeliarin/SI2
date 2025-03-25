@@ -19,7 +19,7 @@ def verificar_censo(censo_data):
 def registrar_voto(voto_dict):
     """Register a vote in the API REST."""
     try:
-        api_url = settings.RESTAPIBASEURL + 'votos/'
+        api_url = settings.RESTAPIBASEURL + 'voto/'
         response = requests.post(api_url, json=voto_dict)
         response.raise_for_status()
 
@@ -36,7 +36,7 @@ def registrar_voto(voto_dict):
 def eliminar_voto(idVoto):
     """Delete a vote from the API."""
     try:
-        api_url = settings.RESTAPIBASEURL + f'votos/{idVoto}/'
+        api_url = settings.RESTAPIBASEURL + f'voto/{idVoto}/'
         response = requests.delete(api_url)
         response.raise_for_status()
         
@@ -49,7 +49,7 @@ def eliminar_voto(idVoto):
 def get_votos_from_db(idProcesoElectoral):
     """Gets votes from the API REST corresponding to some electoral process."""
     try:
-        api_url = settings.RESTAPIBASEURL + 'votos/'
+        api_url = settings.RESTAPIBASEURL + 'voto/'
         response = requests.get(api_url, params={'idProcesoElectoral': idProcesoElectoral})
         response.raise_for_status()
         
