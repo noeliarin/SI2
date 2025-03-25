@@ -173,9 +173,10 @@ class VotoView(APIView):
             codigoRespuesta=codigoRespuesta
         )
 
-        # Incluir el identificador del censo en la respuesta
+        # Incluir el identificador del censo en la respuesta y el mensaje que espera JMeter
         voto_dict = model_to_dict(voto)
         voto_dict['censo_id'] = votante.numeroDNI
+        voto_dict['mensaje'] = "Voto Registrado"
 
         # Retornar la respuesta con los detalles del voto creado
         return Response(voto_dict, status=status.HTTP_200_OK)
