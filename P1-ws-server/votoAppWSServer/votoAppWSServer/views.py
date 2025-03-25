@@ -1,9 +1,62 @@
+from django.urls import reverse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Censo, Voto
 from django.forms.models import model_to_dict
 from django.utils.timezone import now
+
+
+from django.shortcuts import redirect, render
+from votoAppWSServer.forms import VotoForm, CensoForm, DelVotoForm, GetVotosForm
+from votoAppWSServer.votoDB import (verificar_censo, registrar_voto,
+                            eliminar_voto, get_votos_from_db)
+
+TITLE = '(votoSite)'
+
+def testbd(request):
+
+    if request.method == 'POST':
+
+        voto_form = VotoForm(request.POST)
+        censo_form = CensoForm(request.POST)
+        censo_form.get_context()
+        voto_form.get_context()
+
+        if verificar_censo(censo_form.cleaned_data) is False:
+            return render(
+                request, 'template_mensaje.html',
+                {'mensaje': '¡Error: Votante no registrado en el Censo!',
+                 'title': TITLE})
+
+        data = voto_form.cleaned_data
+        data['censo_id'] = censo_form.cleaned_data['numeroDNI']
+
+        # save voto
+
+        voto = registrar_voto(data)
+
+        if voto is None:
+            return render(
+                request, 'template_mensaje.html',
+                {'mensaje': 'Error al registrar voto!',
+                 'title': TITLE})
+
+        context_dict = {'voto': voto, 'title': TITLE}
+
+        return render(request, 'template_exito.html', context_dict)
+    else:
+        voto_form = VotoForm()
+        del_voto_form = DelVotoForm()
+        censo_form = CensoForm()
+        get_votos_form = GetVotosForm()
+
+        return render(request, 'template_test_bd.html',
+                      {'voto_form': voto_form,
+                       'censo_form': censo_form,
+                       'del_voto_form': del_voto_form,
+                       'get_votos_form': get_votos_form,
+                       'title': TITLE})
 
 
 
@@ -17,16 +70,19 @@ from django.utils.timezone import now
 class CensoView(APIView):
     """Validación de la existencia del votante en el censo"""
     
+    def get(self, request):
+        """Permite que GET no genere error 405"""
+        return Response({'message': 'Método GET no implementado en esta API, usa POST.'}, status=status.HTTP_200_OK)
+
     def post(self, request):
-        print(f"Datos recibidos: {request.data}")  # 👈 Depuración en la terminal
+        print(f"Datos recibidos: {request.data}")  
 
-        numeroDNI = request.data.get('numeroDNI')
-        nombre = request.data.get('nombre')
-        fechaNacimiento = request.data.get('fechaNacimiento')
-        anioCenso = request.data.get('anioCenso')
-        codigoAutorizacion = request.data.get('codigoAutorizacion')
+        numeroDNI = request.data.get('numeroDNI', '').strip()
+        nombre = request.data.get('nombre', '').strip()
+        fechaNacimiento = request.data.get('fechaNacimiento', '').strip()
+        codigoAutorizacion = request.data.get('codigoAutorizacion', '').strip()
 
-        if not all([numeroDNI, nombre, fechaNacimiento, anioCenso, codigoAutorizacion]):
+        if not all([numeroDNI, nombre, fechaNacimiento, codigoAutorizacion]):
             return Response(
                 {'message': 'Faltan datos obligatorios'},
                 status=status.HTTP_400_BAD_REQUEST
@@ -36,14 +92,13 @@ class CensoView(APIView):
             numeroDNI=numeroDNI,
             nombre=nombre,
             fechaNacimiento=fechaNacimiento,
-            anioCenso=anioCenso,
             codigoAutorizacion=codigoAutorizacion
         ).exists():
-            return Response({'message': 'Usuario encontrado en el censo.'}, status=status.HTTP_200_OK)
+            request.session['numeroDNI'] = numeroDNI
+            return redirect('/restapiserver/voto/')            
 
-        return Response({'message': 'Datos no encontrados en Censo.'}, status=status.HTTP_404_NOT_FOUND)
-
-
+        return Response({'message': 'Error.'}, status=status.HTTP_404_NOT_FOUND)
+    
 class VotoView(APIView):
     """Emisión y eliminación de un voto"""
 
@@ -101,7 +156,6 @@ class VotoView(APIView):
         # Retornar la respuesta con los detalles del voto creado
         return Response(voto_dict, status=status.HTTP_200_OK)
 
-
     def delete(self, request, id_voto):
         """Eliminar un voto por ID"""
         try:
@@ -110,8 +164,7 @@ class VotoView(APIView):
             return Response({'message': 'Voto eliminado correctamente.'}, status=status.HTTP_200_OK)
         except Voto.DoesNotExist:
             return Response({'message': 'Voto no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
-        
-        
+
 class ProcesoElectoralView(APIView):
     """Consulta de votos por proceso electoral"""
     def get(self, request, idProcesoElectoral):

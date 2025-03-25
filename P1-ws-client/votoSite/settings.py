@@ -15,7 +15,6 @@ from dotenv import load_dotenv
 import os
 import dj_database_url
 
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 # Load environment variables
@@ -28,7 +27,7 @@ load_dotenv(dotenv_path=env_file)
 # SECURITY WARNING: keep the secret key used in production secret!
 # SECRET_KEY = 'django-insecure-alczftn)j1#$v%xmk@5j(n*px43c8kxgi_ua4%khc+t7g_)s9d'
 SECRET_KEY = os.environ.get("SECRET_KEY")
-
+RESTAPIBASEURL = os.environ.get("RESTAPIBASEURL")
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = True
 DEBUG = os.environ.get("DEBUG")
@@ -45,7 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'votoApp.apps.AppConfig',
+    'votoAppWSClient.apps.AppConfig',
 ]
 
 MIDDLEWARE = [
@@ -131,7 +130,7 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # store session in memory instead on in database
-SESSION_ENGINE = "django.contrib.sessions.backends.db"
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 
 CACHES = {
     "default": {
@@ -141,3 +140,5 @@ CACHES = {
 }
 
 DATABASE_SERVER_URL = os.environ.get("DATABASE_SERVER_URL")
+STATIC_ROOT = BASE_DIR / "staticfiles"
+

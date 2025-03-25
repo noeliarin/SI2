@@ -16,10 +16,12 @@ Including another URLconf
 """
 from django.urls import path
 from votoAppWSServer.views import CensoView, VotoView, ProcesoElectoralView
+from votoAppWSServer import views
 
 urlpatterns = [
+    path('testbd/', views.testbd, name='testbd'),
     path("censo/", CensoView.as_view(), name="censo"),
     path("voto/", VotoView.as_view(), name="voto"),
-    path("procesoelectoral/<str:idProcesoElectoral>/", ProcesoElectoralView.as_view(), name="procesoelectoral"),
-    path("voto/<str:id_voto>/", VotoView.as_view(), name="voto-delete")  # Asegúrate de que el parámetro id_voto esté en la URL
+    path("procesoelectoral/<str:idProcesoElectoral>/", ProcesoElectoralView.as_view(), name="getvotos"),
+    path("voto/<int:id_voto>/", VotoView.as_view(), name="delvoto")  # Asegúrate de que el parámetro id_voto esté en la URL
 ]

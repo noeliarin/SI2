@@ -35,6 +35,7 @@ DEBUG = os.environ.get("DEBUG")
 
 ALLOWED_HOSTS = ['*']
 
+RESTAPIBASEURL = 'http://localhost:8000'
 
 # Application definition
 
