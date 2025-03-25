@@ -17,4 +17,4 @@ DATABASE_SERVER_URL='postgres://alumnodb:alumnodb@localhost:15432/voto'
 # so let us define a sqlite in orden to avoid warning messages
 DEBUG=True
 SECRET_KEY = 'django-insecure-alczftn)j1#$v%xmk@5j(n*px43c8kxgi_ua4%khc+t7g_)s9d'
-RESTAPIBASEURL='http:/localhost:28000/restapiserver/'
+RESTAPIBASEURL='http://localhost:28000/restapiserver/'

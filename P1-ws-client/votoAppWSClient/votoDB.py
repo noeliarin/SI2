@@ -3,15 +3,14 @@ from django.conf import settings
 
 # Verificar si el votante está en el censo
 def verificar_censo(censo_data):
-    """Check if the voter is registered in the Censo."""
     try:
         api_url = settings.RESTAPIBASEURL + 'censo/'
-        # Usamos POST y enviamos el payload en formato JSON
         response = requests.post(api_url, json=censo_data)
-        response.raise_for_status()
-
-        data_response = response.json()
-        return bool(data_response)
+        # Si el código es 200 o 302, consideramos que el censo es válido.
+        if response.status_code in (200, 302):
+            return True
+        else:
+            return False
     except requests.exceptions.RequestException as e:
         print(f"Error en verificar_censo: {e}")
         return False
@@ -58,4 +57,6 @@ def get_votos_from_db(idProcesoElectoral):
     except requests.exceptions.RequestException as e:
         print(f"Error en get_votos_from_db: {e}")
         return []
+    
+
 
