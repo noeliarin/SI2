@@ -120,17 +120,26 @@ class VotoView(APIView):
 
         # Obtener el número de DNI del votante desde la sesión
         numeroDNI = request.session.get('numeroDNI')
+        if not numeroDNI:
+            return Response(
+                {'message': 'No se ha validado el censo (número de DNI ausente).'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         
         # Obtener los datos enviados por JMeter
         id_proceso = request.data.get('idProcesoElectoral', '').strip()
-        # Usamos "nombre" para el nombre del candidato votado
+        # Se usará "nombre" para el nombre del candidato votado
         nombreCandidatoVotado = request.data.get('nombre', '').strip()
         # Se usa "fechaNacimiento" para el idCircunscripcion
         id_circunscripcion = request.data.get('fechaNacimiento', '').strip()
         # Se usa "codigoAutorizacion" para el idMesaElectoral
         id_mesa = request.data.get('codigoAutorizacion', '').strip()
         
-        # Se fija un código de respuesta (podría venir también en la petición si se requiere)
+        # Acortar id_mesa si supera 16 caracteres
+        if len(id_mesa) > 16:
+            id_mesa = id_mesa[:16]
+        
+        # Se fija un código de respuesta (se fija a "200")
         codigoRespuesta = "200"
         
         # Verificar que todos los datos obligatorios estén presentes
@@ -148,8 +157,11 @@ class VotoView(APIView):
 
         # Verificar si el votante ya ha emitido un voto en este proceso electoral
         if Voto.objects.filter(censo=votante, idProcesoElectoral=id_proceso).exists():
-            return Response({'message': 'El votante ya ha emitido un voto en este proceso electoral.'}, status=status.HTTP_400_BAD_REQUEST)
-
+            return Response(
+                {'message': 'El votante ya ha emitido un voto en este proceso electoral.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
         # Crear un nuevo voto usando los valores mapeados
         voto = Voto.objects.create(
             censo=votante,
@@ -167,16 +179,6 @@ class VotoView(APIView):
 
         # Retornar la respuesta con los detalles del voto creado
         return Response(voto_dict, status=status.HTTP_200_OK)
-    
-    def delete(self, request, id_voto):
-        """Eliminar un voto por ID"""
-        try:
-            voto = Voto.objects.get(id=id_voto)
-            voto.delete()
-            return Response({'message': 'Voto eliminado correctamente.'}, status=status.HTTP_200_OK)
-        except Voto.DoesNotExist:
-            return Response({'message': 'Voto no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
-        
         
 class ProcesoElectoralView(APIView):
     """Consulta de votos por proceso electoral"""
