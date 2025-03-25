@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Listado de votos  {{ title}}</title>
+</head>
+<body>
+    <h2>Votos Registrados  {{ title}}</h2>
+	<table border = "1">
+	<tr>
+	<td>id</td>
+	<td>IdCircunscripcion</td>
+	<td>IdMesaElectoral</td>
+	<td>Candidato Votado</td>
+	<td>Marca Tiempo</td>
+	<td>Codigo Respuesta</td>
+	</tr>
+
+	{% for voto in result %}
+	<tr>
+		<td> {{voto.id}} </td>
+		<td> {{voto.idCircunscripcion}} </td>
+		<td> {{voto.idMesaElectoral}} </td>
+		<td> {{voto.nombreCandidatoVotado}} </td>
+		<td> {{voto.marcaTiempo}} </td>
+		<td> {{voto.codigoRespuesta}} </td>
+	</tr>
+	{% endfor %}
+	</table>
+</body>
+</html>

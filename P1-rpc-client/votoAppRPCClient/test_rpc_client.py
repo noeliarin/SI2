@@ -162,7 +162,6 @@ class VotingViewsTest(TestCase):
         # Check result
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         voto = response.context.get('voto')
-        print("voto", voto)
         # compare voto and voto_valid_data
         for key in self.voto_valid_data:
             if key == 'censo_id':

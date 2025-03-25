@@ -1,0 +1,20 @@
+# IMPORTANT: this file should not be in a repository
+# To remove a file named env from a Git repository 
+# but keep it in the source (local system), follow these steps:
+# Remove the file from Git tracking but keep it locally
+## git rm --cached env
+# Add 'env' to .gitignore (so it's not tracked again)
+## echo "env" >> .gitignore
+# Commit the changes
+## git commit -m "Removed env from Git tracking and added to .gitignore"
+# Push the changes to the remote repository
+## git push
+# use sqlite 3
+##DATABASE_SERVER_URL=sqlite:///db.sqlite3
+# use postgres
+DATABASE_SERVER_URL='postgres://alumnodb:alumnodb@10.27.23.148:15432/voto'
+# The client does not need to store data in any database
+# so let us define a sqlite in orden to avoid warning messages
+DEBUG=True
+SECRET_KEY = 'django-insecure-alczftn)j1#$v%xmk@5j(n*px43c8kxgi_ua4%khc+t7g_)s9d'
+RPCAPIBASEURL ='http://10.27.23.148:28000/votoAppRPCServer/rpc'
