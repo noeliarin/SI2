@@ -105,7 +105,7 @@ class VotoView(APIView):
         id_circunscripcion = request.data.get('idCircunscripcion', '1')
         id_mesa = request.data.get('idMesaElectoral', '1')
         opcion = request.data.get('nombreCandidatoVotado', 'Candidato')
-        codigo_respuesta = request.data.get('codigoRespuesta', 'ABC123')
+        codigo_respuesta = request.data.get('codigoRespuesta', 'ABC')
 
         # Registrar el voto
         voto = Voto.objects.create(
