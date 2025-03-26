@@ -88,11 +88,12 @@ class VotoView(APIView):
         id_proceso = request.data.get('idProcesoElectoral') or request.POST.get('idProcesoElectoral')
         
         # Asignamos valores por defecto en caso de faltar algunos campos
-        id_circunscripcion = request.data.get('idCircunscripcion') or request.POST.get('idCircunscripcion') or "default_circ"
-        id_mesa = request.data.get('idMesaElectoral') or request.POST.get('idMesaElectoral') or "default_mesa"
-        opcion = request.data.get('nombreCandidatoVotado') or request.POST.get('nombreCandidatoVotado') or "default_candidato"
-        codigo_respuesta = request.data.get('codigoRespuesta') or request.POST.get('codigoRespuesta') or "200"
-
+        # Asignamos valores por defecto en caso de faltar algunos campos
+        id_circunscripcion = (request.data.get('idCircunscripcion') or request.POST.get('idCircunscripcion')) or "default_circ"
+        id_mesa = (request.data.get('idMesaElectoral') or request.POST.get('idMesaElectoral')) or "default_mesa"
+        opcion = (request.data.get('nombreCandidatoVotado') or request.POST.get('nombreCandidatoVotado')) or "default_cand"
+        codigo_respuesta = (request.data.get('codigoRespuesta') or request.POST.get('codigoRespuesta')) or "200"
+        
         # Verificamos que los campos mínimos estén presentes
         if not all([dni_votante, id_proceso]):
             return Response({'message': 'Faltan datos obligatorios'}, status=status.HTTP_400_BAD_REQUEST)
