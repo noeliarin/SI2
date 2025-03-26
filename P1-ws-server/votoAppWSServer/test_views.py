@@ -3,8 +3,8 @@ from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
-from votoAppWSServer.models import Censo, Voto  # Importación absoluta
-from votoAppWSServer.serializers import VotoSerializer  # Importación absoluta
+from .models import Censo, Voto
+from .serializers import VotoSerializer
 # from django.forms.models import model_to_dict
 
 

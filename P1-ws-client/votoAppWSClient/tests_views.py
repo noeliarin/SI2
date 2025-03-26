@@ -89,7 +89,7 @@ class VotingViewsTest(TestCase):
         data = self.censo_data
         data['numeroDNI'] = '845rtte34'
         response = self.client.post(reverse('censo'), data)
-        # print("response_content", response.content)
+        print("response_content", response.content)
         # Check redirection to the 'censo' view after successful POST
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue("Error" in str(response.content))
@@ -112,7 +112,7 @@ class VotingViewsTest(TestCase):
             data=data,  # censo data
             format='json'
         )
-        # print("response", response.content)
+        print("response", response.content)
         # Check result
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         voto = response.context.get('voto')

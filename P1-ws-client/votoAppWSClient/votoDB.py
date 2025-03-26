@@ -15,22 +15,22 @@ def verificar_censo(censo_data):
         print(f"Error en verificar_censo: {e}")
         return False
 
-# Registrar un voto en la API REST
 def registrar_voto(voto_dict):
     """Register a vote in the API REST."""
     try:
         api_url = settings.RESTAPIBASEURL + 'voto/'
         response = requests.post(api_url, json=voto_dict)
-        response.raise_for_status()
-
+        response.raise_for_status()  # Lanza una excepción si el código de respuesta es 4xx o 5xx
+        
         if response.status_code in (200, 201):
-            return response.json()
+            return response.json()  # Devolver el JSON si la creación fue exitosa
         else:
-            return None
+            print(f"Error en registrar voto: {response.status_code}")
+            return None  # Retornar None si la respuesta no es exitosa
     except requests.exceptions.RequestException as e:
         print(f"Error en registrar_voto: {e}")
         return None
-    
+
 # Eliminar un voto a través de la API REST
 def eliminar_voto(idVoto):
     """Delete a vote from the API."""
