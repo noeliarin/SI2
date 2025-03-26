@@ -48,7 +48,3 @@ def get_votos_from_db(idProcesoElectoral):
         return proxy.get_votos_from_db(idProcesoElectoral)
     
 
-<<<<<<< HEAD
-=======
-    
->>>>>>> 767df54 (Guardando cambios locales antes de hacer pull)
