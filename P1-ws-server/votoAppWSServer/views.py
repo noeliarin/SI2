@@ -68,7 +68,7 @@ class CensoView(APIView):
             codigoAutorizacion=codigoAutorizacion
         ).exists():
             request.session['numeroDNI'] = numeroDNI
-            return redirect('/restapiserver/voto/')            
+            return Response({'message': 'Votante encontrado', 'numeroDNI': numeroDNI}, status=status.HTTP_200_OK)           
 
         return Response({'message': 'Error: Usuario no encontrado en el censo'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -83,19 +83,12 @@ class VotoView(APIView):
     def post(self, request):
         print(f"Datos recibidos: {request.data}")  # Debug
 
-        # Datos enviados por JMeter
-        id_proceso = request.data.get('idProcesoElectoral')
-        nombre = request.data.get('nombre')
-        fecha_nacimiento = request.data.get('fechaNacimiento')
-        codigo_autorizacion = request.data.get('codigoAutorizacion')
+        censo_id = request.data.get('censo_id')
 
-        # Buscar al votante en el censo
+# Buscar al votante por su número de DNI
         try:
-            votante = Censo.objects.get(
-                nombre=nombre,
-                fechaNacimiento=fecha_nacimiento,
-                codigoAutorizacion=codigo_autorizacion
-            )
+            votante = Censo.objects.get(numeroDNI=censo_id)
+
         except Censo.DoesNotExist:
             return Response({'message': 'Votante no encontrado en el censo.'}, status=status.HTTP_404_NOT_FOUND)
 
