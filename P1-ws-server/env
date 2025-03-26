@@ -1,5 +1,5 @@
 # this file should not be in the repository
-DATABASE_SERVER_URL='postgres://alumnodb:alumnodb@10.27.23.148:15432/voto'
+DATABASE_SERVER_URL='postgres://alumnodb:alumnodb@localhost:15432/voto'
 #DATABASE_URL=postgresql://voto_owner:npg_YksxB1dlch0j@ep-divine-cloud-a89rnswt-pooler.eastus2.azure.neon.tech/voto?sslmode=require
 # The client does not need to store data in any database
 # so let us define a sqlite in orden to avoid warning messages
