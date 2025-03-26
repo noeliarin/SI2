@@ -82,14 +82,19 @@ class VotoView(APIView):
     def post(self, request):
         print(f"Datos recibidos: {request.data}")  # Debug
 
-        dni_votante = request.data.get('numeroDNI') or request.POST.get('numeroDNI')
+        # Obtener DNI usando 'numeroDNI' o 'censo_id'
+        dni_votante = (request.data.get('numeroDNI') or request.POST.get('numeroDNI') or
+                       request.data.get('censo_id') or request.POST.get('censo_id'))
         id_proceso = request.data.get('idProcesoElectoral') or request.POST.get('idProcesoElectoral')
-        id_circunscripcion = request.data.get('idCircunscripcion') or request.POST.get('idCircunscripcion')
-        id_mesa = request.data.get('idMesaElectoral') or request.POST.get('idMesaElectoral')
-        opcion = request.data.get('nombreCandidatoVotado') or request.POST.get('nombreCandidatoVotado')
-        codigo_respuesta = request.data.get('codigoRespuesta') or request.POST.get('codigoRespuesta')
+        
+        # Asignamos valores por defecto en caso de faltar algunos campos
+        id_circunscripcion = request.data.get('idCircunscripcion') or request.POST.get('idCircunscripcion') or "default_circ"
+        id_mesa = request.data.get('idMesaElectoral') or request.POST.get('idMesaElectoral') or "default_mesa"
+        opcion = request.data.get('nombreCandidatoVotado') or request.POST.get('nombreCandidatoVotado') or "default_candidato"
+        codigo_respuesta = request.data.get('codigoRespuesta') or request.POST.get('codigoRespuesta') or "200"
 
-        if not all([dni_votante, id_proceso, id_circunscripcion, id_mesa, opcion, codigo_respuesta]):
+        # Verificamos que los campos mínimos estén presentes
+        if not all([dni_votante, id_proceso]):
             return Response({'message': 'Faltan datos obligatorios'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
@@ -117,6 +122,14 @@ class VotoView(APIView):
         # Renderizamos el template incluyendo 'mensaje' con "Voto Registrado"
         context = {'voto': voto_dict, 'title': TITLE, 'mensaje': 'Voto Registrado'}
         return render(request, 'template_exito.html', context)
+
+    def delete(self, request, id_voto):
+        try:
+            voto = Voto.objects.get(id=id_voto)
+            voto.delete()
+            return Response({'message': 'Voto eliminado correctamente.'}, status=status.HTTP_200_OK)
+        except Voto.DoesNotExist:
+            return Response({'message': 'Voto no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
 
 class ProcesoElectoralView(APIView):
     """Consulta de votos por proceso electoral"""
