@@ -75,32 +75,37 @@ class CensoView(APIView):
 class VotoView(APIView):
     """Emisión y eliminación de un voto"""
 
-    def get(self, request):
-        """Evita error 405"""
-        return Response({'message': 'Método GET no implementado en esta API, usa POST.'}, status=status.HTTP_200_OK)
-
     def post(self, request):
         print(f"Datos recibidos: {request.data}")  # Debug
 
-        dni_votante = request.data.get('numeroDNI') or request.POST.get('numeroDNI')
-        id_proceso = request.data.get('idProcesoElectoral') or request.POST.get('idProcesoElectoral')
-        id_circunscripcion = request.data.get('idCircunscripcion') or request.POST.get('idCircunscripcion')
-        id_mesa = request.data.get('idMesaElectoral') or request.POST.get('idMesaElectoral')
-        opcion = request.data.get('nombreCandidatoVotado') or request.POST.get('nombreCandidatoVotado')
-        codigo_respuesta = request.data.get('codigoRespuesta') or request.POST.get('codigoRespuesta')
+        # Datos enviados por JMeter
+        id_proceso = request.data.get('idProcesoElectoral')
+        nombre = request.data.get('nombre')
+        fecha_nacimiento = request.data.get('fechaNacimiento')
+        codigo_autorizacion = request.data.get('codigoAutorizacion')
 
-        if not all([dni_votante, id_proceso, id_circunscripcion, id_mesa, opcion, codigo_respuesta]):
-            return Response({'message': 'Faltan datos obligatorios'}, status=status.HTTP_400_BAD_REQUEST)
-
+        # Buscar al votante en el censo
         try:
-            votante = Censo.objects.get(numeroDNI=dni_votante)
+            votante = Censo.objects.get(
+                nombre=nombre,
+                fechaNacimiento=fecha_nacimiento,
+                codigoAutorizacion=codigo_autorizacion
+            )
         except Censo.DoesNotExist:
             return Response({'message': 'Votante no encontrado en el censo.'}, status=status.HTTP_404_NOT_FOUND)
 
+        # Validar que no haya votado ya
         if Voto.objects.filter(censo=votante, idProcesoElectoral=id_proceso).exists():
             return Response({'message': 'El votante ya ha emitido un voto en este proceso electoral.'},
                             status=status.HTTP_400_BAD_REQUEST)
 
+        # Asignar valores por defecto si no se envían
+        id_circunscripcion = request.data.get('idCircunscripcion', '1')
+        id_mesa = request.data.get('idMesaElectoral', '1')
+        opcion = request.data.get('nombreCandidatoVotado', 'Candidato Predeterminado')
+        codigo_respuesta = request.data.get('codigoRespuesta', 'ABC123')
+
+        # Registrar el voto
         voto = Voto.objects.create(
             censo=votante,
             idProcesoElectoral=id_proceso,
@@ -114,9 +119,9 @@ class VotoView(APIView):
         voto_dict = model_to_dict(voto)
         voto_dict['censo_id'] = votante.numeroDNI
 
-        # Renderizamos el template incluyendo 'mensaje' con "Voto Registrado"
-        context = {'voto': voto_dict, 'title': TITLE, 'mensaje': 'Voto Registrado'}
-        return render(request, 'template_exito.html', context)
+        # Respuesta esperada por JMeter
+        return Response({'message': 'Voto Registrado', 'voto': voto_dict}, status=status.HTTP_200_OK)
+
 
 class ProcesoElectoralView(APIView):
     """Consulta de votos por proceso electoral"""
