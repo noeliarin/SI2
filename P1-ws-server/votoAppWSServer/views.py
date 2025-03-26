@@ -72,7 +72,6 @@ class CensoView(APIView):
 
         return Response({'message': 'Error: Usuario no encontrado en el censo'}, status=status.HTTP_404_NOT_FOUND)
 
-
 class VotoView(APIView):
     """Emisión y eliminación de un voto"""
 
@@ -95,7 +94,8 @@ class VotoView(APIView):
             return Response({'message': 'Votante no encontrado en el censo.'}, status=status.HTTP_404_NOT_FOUND)
 
         if Voto.objects.filter(censo=votante, idProcesoElectoral=id_proceso).exists():
-            return Response({'message': 'El votante ya ha emitido un voto en este proceso electoral.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'El votante ya ha emitido un voto en este proceso electoral.'},
+                            status=status.HTTP_400_BAD_REQUEST)
 
         voto = Voto.objects.create(
             censo=votante,
@@ -108,18 +108,11 @@ class VotoView(APIView):
         )
 
         voto_dict = model_to_dict(voto)
-        voto_dict['censo_id'] = votante.numeroDNI  
+        voto_dict['censo_id'] = votante.numeroDNI
 
-        return Response(voto_dict, status=status.HTTP_201_CREATED)
-
-    def delete(self, request, id_voto):
-        try:
-            voto = Voto.objects.get(id=id_voto)
-            voto.delete()
-            return Response({'message': 'Voto eliminado correctamente.'}, status=status.HTTP_200_OK)
-        except Voto.DoesNotExist:
-            return Response({'message': 'Voto no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
-
+        # Renderizamos el template incluyendo 'mensaje' con "Voto Registrado"
+        context = {'voto': voto_dict, 'title': TITLE, 'mensaje': 'Voto Registrado'}
+        return render(request, 'template_exito.html', context)
 
 class ProcesoElectoralView(APIView):
     """Consulta de votos por proceso electoral"""
