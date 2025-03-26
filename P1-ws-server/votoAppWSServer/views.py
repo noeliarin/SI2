@@ -74,6 +74,11 @@ class CensoView(APIView):
 
 class VotoView(APIView):
     """Emisión y eliminación de un voto"""
+    
+    def get(self, request):
+        """Evita error 405"""
+        return Response({'message': 'Método GET no implementado en esta API, usa POST.'}, status=status.HTTP_200_OK)
+
 
     def post(self, request):
         print(f"Datos recibidos: {request.data}")  # Debug
